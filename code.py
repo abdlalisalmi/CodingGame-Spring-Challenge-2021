@@ -1,7 +1,6 @@
 import sys
 import math
 
-
 MY_TREES = list()
 SEED = list()
 GROW = list()
@@ -29,10 +28,14 @@ class Tree:
         return False
 
 
-def get_number_of_trees(size):
+def get_number_of_trees(size=None):
     number = 0
-    for tree in MY_TREES:
-        if tree.size == size:
+    if not size == None:
+        for tree in MY_TREES:
+            if tree.size == size:
+                number += 1
+    else:
+        for tree in MY_TREES:
             number += 1
     return number
 
@@ -99,14 +102,12 @@ def bronze_algorithme(sun, day):
     #seed bets index
     #grow the best index green yellow orange
     #wait
-
     if COMPLETE:
         if get_number_of_trees(3) > 3 or day >= 13:
             COMPLETE.sort()
             if sun >= 4:
                 print(f"{COMPLETE[0]}")
                 return
-
     if SEED:
         if day < 16 and seed_to_green():
             SEED.sort()
@@ -115,7 +116,6 @@ def bronze_algorithme(sun, day):
                 seed = get_bets_seed()
                 print(f"SEED {seed.get('frm')} {seed.get('to')}")
                 return
-
         if day < 16 and seed_to_yellow() and get_number_of_trees(3):
             SEED.sort()
             #print(SEED, file=sys.stderr, flush=True)
@@ -123,7 +123,6 @@ def bronze_algorithme(sun, day):
                 seed = get_bets_seed()
                 print(f"SEED {seed.get('frm')} {seed.get('to')}")
                 return
-
     if GROW:
         green_trees = get_green_trees()
         if green_trees:
@@ -132,7 +131,6 @@ def bronze_algorithme(sun, day):
                 if tree.size == 0 and get_number_of_trees(0) <= sun or tree.size == 1 and sun >= 3 or tree.size == 2 and sun >= 7:
                     print(f"GROW {tree.index}")
                     return
-        
         yellow_trees = get_yellow_trees()
         print(f"tree : {yellow_trees}", file=sys.stderr, flush=True)
         if yellow_trees:
@@ -141,7 +139,6 @@ def bronze_algorithme(sun, day):
                 if tree.size == 0 and get_number_of_trees(0) <= sun or tree.size == 1 and sun >= 3 or tree.size == 2 and sun >= 7:
                     print(f"GROW {tree.index}")
                     return
-
         orange_trees = get_orange_trees()
         if orange_trees:
             for index in orange_trees:
@@ -155,7 +152,6 @@ def bronze_algorithme(sun, day):
 
 
 def evil_algorithme(sun, day):
-    
     def get_target_seed():
         SEED.sort()
         best_seed = []
@@ -165,14 +161,12 @@ def evil_algorithme(sun, day):
             if to >= 7 and to <= 18:
                 return {'frm':frm, 'to': to}
         return None
-
     if COMPLETE:
         if get_number_of_trees(3) > 4 or day >= 20:
             COMPLETE.sort(reverse=True)
             if sun >= 4:
                 print(f"{COMPLETE[0]}")
                 return
-
     if GROW:
         yellow_trees = get_yellow_trees()
         if yellow_trees:
@@ -181,16 +175,13 @@ def evil_algorithme(sun, day):
                 if tree.size == 0 and get_number_of_trees(0) <= sun or tree.size == 1 and sun >= 3 or tree.size == 2 and sun >= 7:
                     print(f"GROW {tree.index}")
                     return
-        
         orange_trees = get_orange_trees()
         if orange_trees:
             for index in orange_trees:
                 tree = get_tree_by_index(index)
                 if tree.size == 0 and get_number_of_trees(0) <= sun or tree.size == 1 and sun >= 3 or tree.size == 2 and sun >= 7:
                     print(f"GROW {tree.index}")
-                    return
-
-        
+                    return        
         green_trees = get_green_trees()
         if green_trees:
             for index in green_trees:
@@ -198,9 +189,7 @@ def evil_algorithme(sun, day):
                 if tree.size == 0 and get_number_of_trees(0) <= sun or tree.size == 1 and sun >= 3 or tree.size == 2 and sun >= 7:
                     print(f"GROW {tree.index}")
                     return
-
     if SEED:
-
         if seed_to_yellow() and len(MY_TREES) <= 8:
             SEED.sort()
             if get_number_of_trees(0) <= sun:
@@ -208,7 +197,111 @@ def evil_algorithme(sun, day):
                 if seed:
                     print(f"SEED {seed.get('frm')} {seed.get('to')}")
                     return
-                    
+    print("WAIT Zzz")
+
+
+
+def get_green_seed(seeds):
+    green_seeds = list()
+    for seed in seeds:
+        to = int(seed.split(" ")[2])
+        if to >= 0 and to <= 6:
+            green_seeds.append(seed)
+    return green_seeds
+
+def get_yellow_seed(seeds):
+    green_seeds = list()
+    for seed in seeds:
+        to = int(seed.split(" ")[2])
+        if to >= 7 and to <= 18:
+            green_seeds.append(seed)
+    return green_seeds
+
+def get_orange_seed(seeds):
+    orange_seeds = list()
+    for seed in seeds:
+        to = int(seed.split(" ")[2])
+        if to >= 19 and to <= 36:
+            orange_seeds.append(seed)
+    return orange_seeds
+
+def best_seed_tree_and_index():
+    best_seed = []
+    if get_number_of_trees(3):
+        bigger_trees_index = []
+        for tree in MY_TREES:
+            if tree.size == 3:
+                bigger_trees_index.append(tree.index)
+        for seed in SEED:
+            if int(seed.split(" ")[1]) in bigger_trees_index:
+                best_seed.append(seed)
+    elif get_number_of_trees(2):
+        medium_trees_index = []
+        for tree in MY_TREES:
+            if tree.size == 2:
+                medium_trees_index.append(tree.index)
+        for seed in SEED:
+            if int(seed.split(" ")[1]) in medium_trees_index:
+                best_seed.append(seed)
+    else:
+        return SEED
+    return best_seed
+
+
+def silver_algorithme(sun, day):
+    #complete
+    #grow the best index green yellow orange
+    #seed bets index
+    #wait
+
+    if COMPLETE:
+        if day >= 16:
+            if sun >= 4:
+                print(f"{COMPLETE[-1]}")
+                return
+
+
+
+    if GROW:
+        green_trees = get_green_trees()
+        if green_trees:
+            for index in green_trees:
+                tree = get_tree_by_index(index)
+                if tree.size == 0 and get_number_of_trees(0) <= sun or tree.size == 1 and sun >= 3 or tree.size == 2 and sun >= 7:
+                    print(f"GROW {tree.index}")
+                    return
+        yellow_trees = get_yellow_trees()
+        if yellow_trees:
+            for index in yellow_trees:
+                tree = get_tree_by_index(index)
+                if tree.size == 0 and get_number_of_trees(0) <= sun or tree.size == 1 and sun >= 3 or tree.size == 2 and sun >= 7:
+                    print(f"GROW {tree.index}")
+                    return
+        orange_trees = get_orange_trees()
+        if orange_trees:
+            for index in orange_trees:
+                tree = get_tree_by_index(index)
+                if tree.size == 0 and get_number_of_trees(0) <= sun or tree.size == 1 and sun >= 3 or tree.size == 2 and sun >= 7:
+                    print(f"GROW {tree.index}")
+                    return
+        
+    if SEED and get_number_of_trees(0) < 2 and get_number_of_trees(1) < 2 and day <= 15:
+        best_seed = best_seed_tree_and_index()
+        if best_seed:
+            green_seeds = get_green_seed(best_seed)
+            if green_seeds:
+                print(green_seeds[0])
+                return
+            yellow_seeds = get_yellow_seed(best_seed)
+            if yellow_seeds:
+                print(yellow_seeds[0])
+                return
+            orange_seeds = get_orange_seed(best_seed)
+            if orange_seeds:
+                print(orange_seeds[0])
+                return
+            
+    
     print("WAIT Zzz")
 
 
@@ -268,8 +361,8 @@ while True:
     #print(COMPLETE, file=sys.stderr, flush=True)
 
     #bronze_algorithme(sun, day)
-    evil_algorithme(sun, day)
-
+    #evil_algorithme(sun, day)
+    silver_algorithme(sun, day)
 
     MY_TREES.clear()
     SEED.clear()
