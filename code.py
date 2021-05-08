@@ -101,14 +101,22 @@ def bronze_algorithme(sun, day):
     #wait
 
     if COMPLETE:
-        if get_number_of_trees(3) > 1 or day > 18:
+        if get_number_of_trees(3) > 3 or day >= 13:
             COMPLETE.sort()
             if sun >= 4:
                 print(f"{COMPLETE[0]}")
                 return
 
     if SEED:
-        if day < 19 and seed_to_green():
+        if day < 16 and seed_to_green():
+            SEED.sort()
+            #print(SEED, file=sys.stderr, flush=True)
+            if len(MY_TREES) < 8 and get_number_of_trees(0) <= sun:
+                seed = get_bets_seed()
+                print(f"SEED {seed.get('frm')} {seed.get('to')}")
+                return
+
+        if day < 16 and seed_to_yellow() and get_number_of_trees(3):
             SEED.sort()
             #print(SEED, file=sys.stderr, flush=True)
             if len(MY_TREES) < 8 and get_number_of_trees(0) <= sun:
