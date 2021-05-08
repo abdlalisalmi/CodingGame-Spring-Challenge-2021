@@ -12,21 +12,6 @@ class Tree:
         self.size = size
         self.dormant = dormant
 
-    def sun_check(self, sun):
-        if self.size == 0:
-            if sun >= 1:
-                return True
-        if self.size == 1:
-            if sun >= 3:
-                return True
-        if self.size == 2:
-            if sun >= 7:
-                return True
-        if self.size == 3:
-            if sun >= 4:
-                return True
-        return False
-
 
 def get_number_of_trees(size=None):
     number = 0
@@ -39,47 +24,36 @@ def get_number_of_trees(size=None):
             number += 1
     return number
 
+
 def get_tree_by_index(index):
     for tree in MY_TREES:
         if tree.index == index:
             return tree
 
 
-def get_green_trees():
+def get_trees_by_color(color):
     trees = []
-    for tree in GROW:
-        index = int(tree.split(" ")[1])
-        if index >= 0 and index <= 6:
-            trees.append(index)
+    if color == 'G':
+        for tree in GROW:
+            index = int(tree.split(" ")[1])
+            if index >= 0 and index <= 6:
+                tree = get_tree_by_index(index)
+                trees.append(tree)
+    elif color == 'Y':
+        for tree in GROW:
+            index = int(tree.split(" ")[1])
+            if index >= 7 and index <= 18:
+                tree = get_tree_by_index(index)
+                trees.append(tree)
+    elif color == 'O':
+        for tree in GROW:
+            index = int(tree.split(" ")[1])
+            if index >= 19 and index <= 36:
+                tree = get_tree_by_index(index)
+                trees.append(tree)
     return trees
 
-def get_yellow_trees():
-    trees = []
-    for tree in GROW:
-        index = int(tree.split(" ")[1])
-        if index >= 7 and index <= 18:
-            trees.append(index)
-    return trees
 
-def get_orange_trees():
-    trees = []
-    for tree in GROW:
-        index = int(tree.split(" ")[1])
-        if index >= 19 and index <= 36:
-            trees.append(index)
-    return trees
-
-def get_bets_seed():
-    SEED.sort()
-    best_seed = []
-    for seed in SEED:
-        best_seed.append({
-            'frm': int(seed.split(" ")[1]),
-            'to': int(seed.split(" ")[2])
-        })
-    best_seed = sorted(best_seed, key=lambda k: k['to'])
-    return best_seed[0]
-    #print(best_seed, file=sys.stderr, flush=True)
 
 def seed_to_green():
     for seed in SEED:
@@ -94,112 +68,6 @@ def seed_to_yellow():
         if to >= 7 and to <= 18:
             return True
     return False
-
-
-
-def bronze_algorithme(sun, day):
-    #complete
-    #seed bets index
-    #grow the best index green yellow orange
-    #wait
-    if COMPLETE:
-        if get_number_of_trees(3) > 3 or day >= 13:
-            COMPLETE.sort()
-            if sun >= 4:
-                print(f"{COMPLETE[0]}")
-                return
-    if SEED:
-        if day < 16 and seed_to_green():
-            SEED.sort()
-            #print(SEED, file=sys.stderr, flush=True)
-            if len(MY_TREES) < 8 and get_number_of_trees(0) <= sun:
-                seed = get_bets_seed()
-                print(f"SEED {seed.get('frm')} {seed.get('to')}")
-                return
-        if day < 16 and seed_to_yellow() and get_number_of_trees(3):
-            SEED.sort()
-            #print(SEED, file=sys.stderr, flush=True)
-            if len(MY_TREES) < 8 and get_number_of_trees(0) <= sun:
-                seed = get_bets_seed()
-                print(f"SEED {seed.get('frm')} {seed.get('to')}")
-                return
-    if GROW:
-        green_trees = get_green_trees()
-        if green_trees:
-            for index in green_trees:
-                tree = get_tree_by_index(index)
-                if tree.size == 0 and get_number_of_trees(0) <= sun or tree.size == 1 and sun >= 3 or tree.size == 2 and sun >= 7:
-                    print(f"GROW {tree.index}")
-                    return
-        yellow_trees = get_yellow_trees()
-        print(f"tree : {yellow_trees}", file=sys.stderr, flush=True)
-        if yellow_trees:
-            for index in yellow_trees:
-                tree = get_tree_by_index(index)
-                if tree.size == 0 and get_number_of_trees(0) <= sun or tree.size == 1 and sun >= 3 or tree.size == 2 and sun >= 7:
-                    print(f"GROW {tree.index}")
-                    return
-        orange_trees = get_orange_trees()
-        if orange_trees:
-            for index in orange_trees:
-                tree = get_tree_by_index(index)
-                if tree.size == 0 and get_number_of_trees(0) <= sun or tree.size == 1 and sun >= 3 or tree.size == 2 and sun >= 7:
-                    print(f"GROW {tree.index}")
-                    return
-        
-    print("WAIT Zzz")
-
-
-
-def evil_algorithme(sun, day):
-    def get_target_seed():
-        SEED.sort()
-        best_seed = []
-        for seed in SEED:
-            frm = int(seed.split(" ")[1])
-            to = int(seed.split(" ")[2])
-            if to >= 7 and to <= 18:
-                return {'frm':frm, 'to': to}
-        return None
-    if COMPLETE:
-        if get_number_of_trees(3) > 4 or day >= 20:
-            COMPLETE.sort(reverse=True)
-            if sun >= 4:
-                print(f"{COMPLETE[0]}")
-                return
-    if GROW:
-        yellow_trees = get_yellow_trees()
-        if yellow_trees:
-            for index in yellow_trees:
-                tree = get_tree_by_index(index)
-                if tree.size == 0 and get_number_of_trees(0) <= sun or tree.size == 1 and sun >= 3 or tree.size == 2 and sun >= 7:
-                    print(f"GROW {tree.index}")
-                    return
-        orange_trees = get_orange_trees()
-        if orange_trees:
-            for index in orange_trees:
-                tree = get_tree_by_index(index)
-                if tree.size == 0 and get_number_of_trees(0) <= sun or tree.size == 1 and sun >= 3 or tree.size == 2 and sun >= 7:
-                    print(f"GROW {tree.index}")
-                    return        
-        green_trees = get_green_trees()
-        if green_trees:
-            for index in green_trees:
-                tree = get_tree_by_index(index)
-                if tree.size == 0 and get_number_of_trees(0) <= sun or tree.size == 1 and sun >= 3 or tree.size == 2 and sun >= 7:
-                    print(f"GROW {tree.index}")
-                    return
-    if SEED:
-        if seed_to_yellow() and len(MY_TREES) <= 8:
-            SEED.sort()
-            if get_number_of_trees(0) <= sun:
-                seed = get_target_seed()
-                if seed:
-                    print(f"SEED {seed.get('frm')} {seed.get('to')}")
-                    return
-    print("WAIT Zzz")
-
-
 
 def get_green_seed(seeds):
     green_seeds = list()
@@ -247,6 +115,80 @@ def best_seed_tree_and_index():
         return SEED
     return best_seed
 
+def valid_tree(tree, sun):
+    return tree.size == 0 and get_number_of_trees(0) <= sun or tree.size == 1 and sun >= 3 or tree.size == 2 and sun >= 7
+
+def grow_function(sun):
+    green_trees = sorted(get_trees_by_color('G'), key=lambda tree: tree.index)
+    yellow_trees = sorted(get_trees_by_color('Y'), key=lambda tree: tree.index)
+    orange_trees = sorted(get_trees_by_color('O'), key=lambda tree: tree.index)
+
+
+    if green_trees:
+        for tree in green_trees:
+            if valid_tree(tree, sun):
+                print(f"GROW {tree.index}")
+                return True
+                
+    if yellow_trees:
+        for tree in yellow_trees:
+            if valid_tree(tree, sun):
+                print(f"GROW {tree.index}")
+                return True
+
+    if orange_trees:
+        for tree in orange_trees:
+            if valid_tree(tree, sun):
+                print(f"GROW {tree.index}")
+                return True
+    
+    return False
+
+def grow_function_v2(sun):
+
+    def single_grow(trees, sun):
+        if trees:
+            if valid_tree(trees[0], sun):
+                print(f"GROW {trees[0].index}")
+                return True
+        return False
+
+    green_trees = sorted(get_trees_by_color('G'), key=lambda tree: tree.index)
+    yellow_trees = sorted(get_trees_by_color('Y'), key=lambda tree: tree.index)
+    orange_trees = sorted(get_trees_by_color('O'), key=lambda tree: tree.index)
+
+    medium_green = [tree for tree in green_trees if tree.size == 2]
+    if single_grow(medium_green, sun):
+        return True
+    medium_yellow = [tree for tree in yellow_trees if tree.size == 2]
+    if single_grow(medium_yellow, sun):
+        return True
+
+    small_green = [tree for tree in green_trees if tree.size == 1]
+    if single_grow(small_green, sun):
+        return True
+    small_yellow = [tree for tree in yellow_trees if tree.size == 1]
+    if single_grow(small_yellow, sun):
+        return True
+    seed_green = [tree for tree in green_trees if tree.size == 0]
+    if single_grow(seed_green, sun):
+        return True
+    
+    medium_orange = [tree for tree in orange_trees if tree.size == 2]
+    if single_grow(medium_orange, sun):
+        return True
+    small_orange = [tree for tree in orange_trees if tree.size == 1]
+    if single_grow(small_orange, sun):
+        return True
+
+    seed_yellow = [tree for tree in yellow_trees if tree.size == 0]
+    if single_grow(seed_yellow, sun):
+        return True
+    seed_orange = [tree for tree in orange_trees if tree.size == 0]
+    if single_grow(seed_orange, sun):
+        return True
+
+    return False
 
 def silver_algorithme(sun, day):
     #complete
@@ -255,37 +197,19 @@ def silver_algorithme(sun, day):
     #wait
 
     if COMPLETE:
-        if day >= 16:
+        if day >= (19 - get_number_of_trees(3)) or get_number_of_trees(3) > 6:
             if sun >= 4:
                 print(f"{COMPLETE[-1]}")
                 return
 
 
-
     if GROW:
-        green_trees = get_green_trees()
-        if green_trees:
-            for index in green_trees:
-                tree = get_tree_by_index(index)
-                if tree.size == 0 and get_number_of_trees(0) <= sun or tree.size == 1 and sun >= 3 or tree.size == 2 and sun >= 7:
-                    print(f"GROW {tree.index}")
-                    return
-        yellow_trees = get_yellow_trees()
-        if yellow_trees:
-            for index in yellow_trees:
-                tree = get_tree_by_index(index)
-                if tree.size == 0 and get_number_of_trees(0) <= sun or tree.size == 1 and sun >= 3 or tree.size == 2 and sun >= 7:
-                    print(f"GROW {tree.index}")
-                    return
-        orange_trees = get_orange_trees()
-        if orange_trees:
-            for index in orange_trees:
-                tree = get_tree_by_index(index)
-                if tree.size == 0 and get_number_of_trees(0) <= sun or tree.size == 1 and sun >= 3 or tree.size == 2 and sun >= 7:
-                    print(f"GROW {tree.index}")
-                    return
-        
-    if SEED and get_number_of_trees(0) < 2 and get_number_of_trees(1) < 2 and day <= 15:
+        if grow_function_v2(sun):
+            return
+
+
+
+    if SEED and get_number_of_trees(0) < 2 and get_number_of_trees(1) < 2 and day <= 16:
         best_seed = best_seed_tree_and_index()
         if best_seed:
             green_seeds = get_green_seed(best_seed)
@@ -356,12 +280,6 @@ while True:
 
     # GROW cellIdx | SEED sourceIdx targetIdx | COMPLETE cellIdx | WAIT <message>
 
-    #print(SEED, file=sys.stderr, flush=True)
-    #print(GROW, file=sys.stderr, flush=True)
-    #print(COMPLETE, file=sys.stderr, flush=True)
-
-    #bronze_algorithme(sun, day)
-    #evil_algorithme(sun, day)
     silver_algorithme(sun, day)
 
     MY_TREES.clear()
