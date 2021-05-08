@@ -154,6 +154,63 @@ def bronze_algorithme(sun, day):
 
 
 
+def evil_algorithme(sun, day):
+    
+    def get_target_seed():
+        SEED.sort()
+        best_seed = []
+        for seed in SEED:
+            frm = int(seed.split(" ")[1])
+            to = int(seed.split(" ")[2])
+            if to >= 7 and to <= 18:
+                return {'frm':frm, 'to': to}
+        return None
+
+    if COMPLETE:
+        if get_number_of_trees(3) > 4 or day >= 20:
+            COMPLETE.sort(reverse=True)
+            if sun >= 4:
+                print(f"{COMPLETE[0]}")
+                return
+
+    if GROW:
+        yellow_trees = get_yellow_trees()
+        if yellow_trees:
+            for index in yellow_trees:
+                tree = get_tree_by_index(index)
+                if tree.size == 0 and get_number_of_trees(0) <= sun or tree.size == 1 and sun >= 3 or tree.size == 2 and sun >= 7:
+                    print(f"GROW {tree.index}")
+                    return
+        
+        orange_trees = get_orange_trees()
+        if orange_trees:
+            for index in orange_trees:
+                tree = get_tree_by_index(index)
+                if tree.size == 0 and get_number_of_trees(0) <= sun or tree.size == 1 and sun >= 3 or tree.size == 2 and sun >= 7:
+                    print(f"GROW {tree.index}")
+                    return
+
+        
+        green_trees = get_green_trees()
+        if green_trees:
+            for index in green_trees:
+                tree = get_tree_by_index(index)
+                if tree.size == 0 and get_number_of_trees(0) <= sun or tree.size == 1 and sun >= 3 or tree.size == 2 and sun >= 7:
+                    print(f"GROW {tree.index}")
+                    return
+
+    if SEED:
+
+        if seed_to_yellow() and len(MY_TREES) <= 8:
+            SEED.sort()
+            if get_number_of_trees(0) <= sun:
+                seed = get_target_seed()
+                if seed:
+                    print(f"SEED {seed.get('frm')} {seed.get('to')}")
+                    return
+                    
+    print("WAIT Zzz")
+
 
 # Auto-generated code below aims at helping you parse
 # the standard input according to the problem statement.
@@ -210,7 +267,8 @@ while True:
     #print(GROW, file=sys.stderr, flush=True)
     #print(COMPLETE, file=sys.stderr, flush=True)
 
-    bronze_algorithme(sun, day)
+    #bronze_algorithme(sun, day)
+    evil_algorithme(sun, day)
 
 
     MY_TREES.clear()
