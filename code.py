@@ -144,49 +144,116 @@ def grow_function(sun):
     
     return False
 
-def grow_function_v2(sun):
+def grow_function_v2(day, sun):
 
-    def single_grow(trees, sun):
+    def applicate_a_grow(trees, sun):
         if trees:
             if valid_tree(trees[0], sun):
                 print(f"GROW {trees[0].index}")
                 return True
         return False
 
+    ##   
+    # Grow the trees with the size 2 in the last days
+    ##
+    if day > 18 and get_number_of_trees(2):
+        green_trees = [tree for tree in get_trees_by_color('G') if tree.size == 2]
+        if green_trees:
+            if applicate_a_grow(green_trees, sun):
+                return True
+        yellow_trees = [tree for tree in get_trees_by_color('Y') if tree.size == 2]
+        if yellow_trees:
+            if applicate_a_grow(yellow_trees, sun):
+                return True
+        orange_trees = [tree for tree in get_trees_by_color('O') if tree.size == 2]
+        if orange_trees:
+            if applicate_a_grow(orange_trees, sun):
+                return True
+
+
     green_trees = sorted(get_trees_by_color('G'), key=lambda tree: tree.index)
     yellow_trees = sorted(get_trees_by_color('Y'), key=lambda tree: tree.index)
     orange_trees = sorted(get_trees_by_color('O'), key=lambda tree: tree.index)
 
     medium_green = [tree for tree in green_trees if tree.size == 2]
-    if single_grow(medium_green, sun):
+    if applicate_a_grow(medium_green, sun):
         return True
     medium_yellow = [tree for tree in yellow_trees if tree.size == 2]
-    if single_grow(medium_yellow, sun):
+    if applicate_a_grow(medium_yellow, sun):
         return True
 
     small_green = [tree for tree in green_trees if tree.size == 1]
-    if single_grow(small_green, sun):
+    if applicate_a_grow(small_green, sun):
         return True
     small_yellow = [tree for tree in yellow_trees if tree.size == 1]
-    if single_grow(small_yellow, sun):
+    if applicate_a_grow(small_yellow, sun):
         return True
     seed_green = [tree for tree in green_trees if tree.size == 0]
-    if single_grow(seed_green, sun):
+    if applicate_a_grow(seed_green, sun):
         return True
     
     medium_orange = [tree for tree in orange_trees if tree.size == 2]
-    if single_grow(medium_orange, sun):
+    if applicate_a_grow(medium_orange, sun):
         return True
     small_orange = [tree for tree in orange_trees if tree.size == 1]
-    if single_grow(small_orange, sun):
+    if applicate_a_grow(small_orange, sun):
         return True
 
     seed_yellow = [tree for tree in yellow_trees if tree.size == 0]
-    if single_grow(seed_yellow, sun):
+    if applicate_a_grow(seed_yellow, sun):
         return True
     seed_orange = [tree for tree in orange_trees if tree.size == 0]
-    if single_grow(seed_orange, sun):
+    if applicate_a_grow(seed_orange, sun):
         return True
+
+    return False
+
+def seed_function():
+    possible_seed = []
+    for seed in SEED:
+        possible_seed.append({
+            'frm':int(seed.split(' ')[1]),
+            'to': int(seed.split(' ')[2])
+        })
+    #possible_seed = sorted(possible_seed, key=lambda seed: seed.get('to'), reverse=True)
+    #print(possible_seed, file=sys.stderr, flush=True)
+
+    ##
+    # SEED TO GREEN
+    ##
+    line1 = [seed for seed in possible_seed if seed.get('to') in [1,2] ]
+    line2 = [seed for seed in possible_seed if seed.get('to') in [3,4] ]
+    line3 = [seed for seed in possible_seed if seed.get('to') in [5,6] ]
+    print(line1, file=sys.stderr, flush=True)
+    if line1:
+        find = False
+        for tree in MY_TREES:
+            if tree.index in [1, 2]:
+                find = True
+            if not find:
+                print(f"SEED {line1[0].get('frm')} {line1[0].get('to')}")
+                return True
+    if line2:
+        find = False
+        for tree in MY_TREES:
+            if tree.index in [3, 4]:
+                find = True
+            if not find:
+                print(f"SEED {line2[0].get('frm')} {line2[0].get('to')}")
+                return True
+    if line3:
+        find = False
+        for tree in MY_TREES:
+            if tree.index in [5, 6]:
+                find = True
+            if not find:
+                print(f"SEED {line3[0].get('frm')} {line3[0].get('to')}")
+                return True
+
+    #if possible_seed:
+    #    print(f"SEED {possible_seed[0].get('frm')} {possible_seed[0].get('to')}")
+    #    return True
+
 
     return False
 
@@ -199,31 +266,30 @@ def silver_algorithme(sun, day):
     if COMPLETE:
         if day >= (19 - get_number_of_trees(3)) or get_number_of_trees(3) > 6:
             if sun >= 4:
-                print(f"{COMPLETE[-1]}")
+                print(f"{COMPLETE[0]}")
                 return
-
 
     if GROW:
-        if grow_function_v2(sun):
+        if grow_function_v2(day, sun):
             return
 
-
-
-    if SEED and get_number_of_trees(0) < 2 and get_number_of_trees(1) < 2 and day <= 16:
-        best_seed = best_seed_tree_and_index()
-        if best_seed:
-            green_seeds = get_green_seed(best_seed)
-            if green_seeds:
-                print(green_seeds[0])
-                return
-            yellow_seeds = get_yellow_seed(best_seed)
-            if yellow_seeds:
-                print(yellow_seeds[0])
-                return
-            orange_seeds = get_orange_seed(best_seed)
-            if orange_seeds:
-                print(orange_seeds[0])
-                return
+    if SEED and (get_number_of_trees(0) + get_number_of_trees(1) < 2) and day <= 16:
+        if seed_function():
+            return
+        #best_seed = best_seed_tree_and_index()
+        #if best_seed:
+        #    green_seeds = get_green_seed(best_seed)
+        #    if green_seeds:
+        #        print(green_seeds[0])
+        #        return
+        #    yellow_seeds = get_yellow_seed(best_seed)
+        #    if yellow_seeds:
+        #        print(yellow_seeds[0])
+        #        return
+        #    orange_seeds = get_orange_seed(best_seed)
+        #    if orange_seeds:
+        #        print(orange_seeds[0])
+        #        return
             
     
     print("WAIT Zzz")
