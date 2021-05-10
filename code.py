@@ -7,10 +7,14 @@ GROW = list()
 COMPLETE = list()
 
 class Tree:
-    def __init__(self, index, size, dormant):
+    def __init__(self, index, size, dormant, neighbors):
         self.index = index
         self.size = size
         self.dormant = dormant
+        self.neighbors = []
+        for neigh in neighbors:
+            if not neigh == -1:
+                self.neighbors.append(neigh)
 
 
 def get_number_of_trees(size=None):
@@ -209,54 +213,42 @@ def grow_function_v2(day, sun):
     return False
 
 def seed_function():
-    possible_seed = []
+    global SEED
+    neighbors_index = set()
+    for tree in MY_TREES:
+        for neigh_index in tree.neighbors:
+            neighbors_index.add(neigh_index)
     for seed in SEED:
-        possible_seed.append({
-            'frm':int(seed.split(' ')[1]),
-            'to': int(seed.split(' ')[2])
-        })
-    #possible_seed = sorted(possible_seed, key=lambda seed: seed.get('to'), reverse=True)
-    #print(possible_seed, file=sys.stderr, flush=True)
+        print(seed, file=sys.stderr, flush=True)
 
-    ##
-    # SEED TO GREEN
-    ##
-    line1 = [seed for seed in possible_seed if seed.get('to') in [1,2] ]
-    line2 = [seed for seed in possible_seed if seed.get('to') in [3,4] ]
-    line3 = [seed for seed in possible_seed if seed.get('to') in [5,6] ]
-    print(line1, file=sys.stderr, flush=True)
-    if line1:
-        find = False
-        for tree in MY_TREES:
-            if tree.index in [1, 2]:
-                find = True
-            if not find:
-                print(f"SEED {line1[0].get('frm')} {line1[0].get('to')}")
-                return True
-    if line2:
-        find = False
-        for tree in MY_TREES:
-            if tree.index in [3, 4]:
-                find = True
-            if not find:
-                print(f"SEED {line2[0].get('frm')} {line2[0].get('to')}")
-                return True
-    if line3:
-        find = False
-        for tree in MY_TREES:
-            if tree.index in [5, 6]:
-                find = True
-            if not find:
-                print(f"SEED {line3[0].get('frm')} {line3[0].get('to')}")
-                return True
+    new_seed = SEED
+    SEED = []
+    for seed in new_seed:
+        if not int(seed.split(" ")[2]) in neighbors_index:
+            SEED.append(seed)
+    print("-----------------", file=sys.stderr, flush=True)
+    for seed in SEED:
+        print(seed, file=sys.stderr, flush=True)
 
-    #if possible_seed:
-    #    print(f"SEED {possible_seed[0].get('frm')} {possible_seed[0].get('to')}")
-    #    return True
+    best_seed = best_seed_tree_and_index()
+    if best_seed:
+        green_seeds = get_green_seed(best_seed)
+        if green_seeds:
+            print(green_seeds[0])
+            return True
+        yellow_seeds = get_yellow_seed(best_seed)
+        if yellow_seeds:
+            print(yellow_seeds[0])
+            return True
+        orange_seeds = get_orange_seed(best_seed)
+        if orange_seeds:
+            print(orange_seeds[0])
+            return True
 
 
     return False
 
+FIERS_COMPLETE = 0
 def silver_algorithme(sun, day):
     #complete
     #grow the best index green yellow orange
@@ -264,9 +256,14 @@ def silver_algorithme(sun, day):
     #wait
 
     if COMPLETE:
+        global FIERS_COMPLETE
+        if get_number_of_trees(3) > 4 and FIERS_COMPLETE < 2:
+            print(f"{COMPLETE[-1]}")
+            FIERS_COMPLETE += 1
+            return
         if day >= (19 - get_number_of_trees(3)) or get_number_of_trees(3) > 6:
             if sun >= 4:
-                print(f"{COMPLETE[0]}")
+                print(f"{COMPLETE[-1]}")
                 return
 
     if GROW:
@@ -276,20 +273,6 @@ def silver_algorithme(sun, day):
     if SEED and (get_number_of_trees(0) + get_number_of_trees(1) < 2) and day <= 16:
         if seed_function():
             return
-        #best_seed = best_seed_tree_and_index()
-        #if best_seed:
-        #    green_seeds = get_green_seed(best_seed)
-        #    if green_seeds:
-        #        print(green_seeds[0])
-        #        return
-        #    yellow_seeds = get_yellow_seed(best_seed)
-        #    if yellow_seeds:
-        #        print(yellow_seeds[0])
-        #        return
-        #    orange_seeds = get_orange_seed(best_seed)
-        #    if orange_seeds:
-        #        print(orange_seeds[0])
-        #        return
             
     
     print("WAIT Zzz")
@@ -299,11 +282,14 @@ def silver_algorithme(sun, day):
 # the standard input according to the problem statement.
 
 number_of_cells = int(input())  # 37
+cell_neighbors = []
 for i in range(number_of_cells):
     # index: 0 is the center cell, the next cells spiral outwards
     # richness: 0 if the cell is unusable, 1-3 for usable cells
     # neigh_0: the index of the neighbouring cell for each direction
     index, richness, neigh_0, neigh_1, neigh_2, neigh_3, neigh_4, neigh_5 = [int(j) for j in input().split()]
+    cell_neighbors.append([neigh_0, neigh_1, neigh_2, neigh_3, neigh_4, neigh_5])
+
 
 # game loop
 while True:
@@ -326,7 +312,7 @@ while True:
         
 
         if is_mine:
-            tree = Tree(cell_index, size, is_dormant)
+            tree = Tree(cell_index, size, is_dormant, cell_neighbors[cell_index])
             MY_TREES.append(tree)
 
 
@@ -346,6 +332,8 @@ while True:
 
     # GROW cellIdx | SEED sourceIdx targetIdx | COMPLETE cellIdx | WAIT <message>
 
+    #print(MY_TREES[0].neighbors, file=sys.stderr, flush=True)
+    
     silver_algorithme(sun, day)
 
     MY_TREES.clear()
