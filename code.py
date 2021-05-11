@@ -218,17 +218,12 @@ def seed_function():
     for tree in MY_TREES:
         for neigh_index in tree.neighbors:
             neighbors_index.add(neigh_index)
-    for seed in SEED:
-        print(seed, file=sys.stderr, flush=True)
 
     new_seed = SEED
     SEED = []
     for seed in new_seed:
         if not int(seed.split(" ")[2]) in neighbors_index:
             SEED.append(seed)
-    print("-----------------", file=sys.stderr, flush=True)
-    for seed in SEED:
-        print(seed, file=sys.stderr, flush=True)
 
     best_seed = best_seed_tree_and_index()
     if best_seed:
@@ -248,7 +243,13 @@ def seed_function():
 
     return False
 
-FIERS_COMPLETE = 0
+def complete_function(day, sun):
+    if day >= (19 - get_number_of_trees(3)) or get_number_of_trees(3) > 6:
+        if sun >= 4:
+            print(f"{COMPLETE[-1]}")
+            return True
+    return False
+
 def silver_algorithme(sun, day):
     #complete
     #grow the best index green yellow orange
@@ -256,15 +257,8 @@ def silver_algorithme(sun, day):
     #wait
 
     if COMPLETE:
-        global FIERS_COMPLETE
-        if get_number_of_trees(3) > 4 and FIERS_COMPLETE < 2:
-            print(f"{COMPLETE[-1]}")
-            FIERS_COMPLETE += 1
+        if complete_function(day, sun):
             return
-        if day >= (19 - get_number_of_trees(3)) or get_number_of_trees(3) > 6:
-            if sun >= 4:
-                print(f"{COMPLETE[-1]}")
-                return
 
     if GROW:
         if grow_function_v2(day, sun):
