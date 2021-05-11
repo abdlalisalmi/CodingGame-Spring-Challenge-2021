@@ -244,9 +244,11 @@ def seed_function():
     return False
 
 def complete_function(day, sun):
+    posible_complete = [index.split(' ')[1] for index in COMPLETE]
+    posible_complete.sort()
     if day >= (19 - get_number_of_trees(3)) or get_number_of_trees(3) > 6:
         if sun >= 4:
-            print(f"{COMPLETE[-1]}")
+            print(f"COMPLETE {posible_complete[0]}")
             return True
     return False
 
