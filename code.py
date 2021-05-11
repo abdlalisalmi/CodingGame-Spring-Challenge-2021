@@ -267,7 +267,6 @@ def silver_algorithme(sun, day):
     if SEED and (get_number_of_trees(0) + get_number_of_trees(1) < 2) and day <= 16:
         if seed_function():
             return
-            
     
     print("WAIT Zzz")
 
